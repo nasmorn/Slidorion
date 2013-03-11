@@ -202,15 +202,36 @@
 						if(section==current){
 							return false;
 						}else{
+
+							// Function changed to make the animation of slideUp and slideDown
+							// simultaneous thus eliminating the jitter at the bottom
+							$unselected = $('.link-header.active + .link-content', obj)
+							var oldHeight = $unselected.height();
 							$('.link-header.active', obj)
 								.removeClass('active')
-								.next('.link-content')
-								.slideUp();
-
+							
 							$objHeader
 								.addClass('active')
-								.next('.link-content')
-								.slideDown();
+							$selected = $('.link-header.active + .link-content', obj)
+							$selected.show();
+							// Hide the overflow to suppress scrollbars during slides
+							$unselected.css('overflow', 'hidden')
+							$selected.css('overflow', 'hidden')
+
+							// Create an animation on a fictional element just to get a step function
+							$('<div>').animate({ height : 1 }, {
+								 duration  : 400, 
+                  step      : function(now) {
+                    var stepSelectedHeight = Math.round(oldHeight * now);
+                    $selected.height(stepSelectedHeight);
+                    $unselected.height(oldHeight - stepSelectedHeight);
+                  },
+                   complete  : function() {
+                    $unselected
+                      .hide()
+                      .css({ height : 0 });
+                    }
+                });
 
 							animation(current, section, effect, speed, easingOption);
 						}
